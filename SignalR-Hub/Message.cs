@@ -7,7 +7,14 @@ namespace SignalRHub
 {
     public class Message
     {
-        public string Type { get; set; }
+        public MessageType Type { get; set; }
         public string Payload { get; set; }
+    }
+
+    public enum MessageType
+    {
+        success,
+        warning,
+        error
     }
 }

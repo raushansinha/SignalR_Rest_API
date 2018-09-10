@@ -8,26 +8,38 @@ using System.Threading.Tasks;
 namespace SignalRHub
 {
     [Route("api/[controller]")]
-    public class MessageController : Controller
+    public class NotificationController : Controller
     {
 
         //referencing NotifyHub & ITypedHubClient using SignalR IHubContext
         private IHubContext<NotifyHub, ITypedHubClient> _hubContext;
 
-        public MessageController(IHubContext<NotifyHub, ITypedHubClient> hubContext)
+        public NotificationController(IHubContext<NotifyHub, ITypedHubClient> hubContext)
         {
             _hubContext = hubContext;
         }
 
        
         [HttpPost]
+        [ActionName("PushMessage")]
         public string Post([FromBody]Message msg)
         {
             string retMessage = string.Empty;
             try
             {
-                _hubContext.Clients.All.BroadcastMessage(msg.Type, msg.Payload);
-                retMessage = "Notification Sent Successfully";
+                switch(msg.Type)
+                {
+                    case MessageType.success:
+                        _hubContext.Clients.All.BroadcastMessage(msg.Type.ToString(), msg.Payload);
+                        retMessage = "Success Sent Successfully";
+                        break;
+                    case MessageType.warning:
+                        _hubContext.Clients.All.BroadcastWarning(msg.Type.ToString(), msg.Payload);
+                        retMessage = "Warning Sent Successfully";
+                        break;
+                    default:
+                        break;
+                }
             }
             catch (Exception e)
             {
